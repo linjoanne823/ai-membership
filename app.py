@@ -1,145 +1,239 @@
-from flask import Flask, request, render_template_string, jsonify
+from flask import Flask, render_template_string, request
 from sentence_transformers import SentenceTransformer, util
 
 app = Flask(__name__)
-
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-members = [
-    {"id": 1, "name": "AbCellera", "bio": "Antibody discovery and development platform.", "industry": "Biotech", "location": "British Columbia", "size": "400", "founded": 2012, "logo": "https://logo.clearbit.com/abcellera.com", "website": "https://www.abcellera.com"},
-    {"id": 2, "name": "Zymeworks", "bio": "Protein therapeutics and antibody drug conjugates.", "industry": "Biotech", "location": "British Columbia", "size": "300", "founded": 2003, "logo": "https://logo.clearbit.com/zymeworks.com", "website": "https://www.zymeworks.com"},
-    {"id": 3, "name": "STEMCELL Technologies", "bio": "Cell culture media and tools for life sciences research.", "industry": "Biotech", "location": "British Columbia", "size": "2000", "founded": 1993, "logo": "https://logo.clearbit.com/stemcell.com", "website": "https://www.stemcell.com"},
-    {"id": 4, "name": "Medicago", "bio": "Plant-based vaccines and mRNA therapeutics.", "industry": "Biotech", "location": "Quebec", "size": "500", "founded": 1999, "logo": "https://logo.clearbit.com/medicago.com", "website": "https://www.medicago.com"},
-    {"id": 5, "name": "Bausch Health", "bio": "Pharmaceutical products in various therapeutic areas.", "industry": "Pharma", "location": "Quebec", "size": "21000", "founded": 1853, "logo": "https://logo.clearbit.com/bauschhealth.com", "website": "https://www.bauschhealth.com"},
-    {"id": 6, "name": "Fusion Pharmaceuticals", "bio": "Radiopharmaceuticals for cancer therapy.", "industry": "Pharma", "location": "Ontario", "size": "100", "founded": 2014, "logo": "https://logo.clearbit.com/fusionpharma.com", "website": "https://www.fusionpharma.com"},
-    {"id": 7, "name": "Satellos Bioscience", "bio": "Regenerative medicine therapies.", "industry": "Biotech", "location": "Ontario", "size": "50", "founded": 2018, "logo": "https://logo.clearbit.com/satellos.com", "website": "https://www.satellos.com"},
-    {"id": 8, "name": "Synaptive Medical", "bio": "Neurosurgical imaging and robotic platforms.", "industry": "Medtech", "location": "Ontario", "size": "200", "founded": 2012, "logo": "https://logo.clearbit.com/synaptivemedical.com", "website": "https://www.synaptivemedical.com"},
-    {"id": 9, "name": "Baylis Medical", "bio": "Medical devices for cardiology and spine surgery.", "industry": "Medtech", "location": "Ontario", "size": "800", "founded": 1986, "logo": "https://logo.clearbit.com/baylismedical.com", "website": "https://www.baylismedical.com"},
-    {"id": 10, "name": "Opsens", "bio": "Innovative optical sensor solutions.", "industry": "Medtech", "location": "Quebec", "size": "150", "founded": 2003, "logo": "https://logo.clearbit.com/opsens.com", "website": "https://www.opsens.com"}
-]
-
-for member in members:
-    member['embedding'] = model.encode(member['bio'], normalize_embeddings=True).tolist()
-
-HTML_TEMPLATE = '''
+HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Life Sciences Member Directory</title>
-<style>
-    body { font-family: Arial, sans-serif; margin: 0; background: #f5f5f5; }
-header {
-  background: url('https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg') center/cover no-repeat;
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  text-shadow: 1px 1px 4px #000;
-}    header h1 { font-size: 36px; }
-    .content { padding: 20px; text-align: center; }
-    .intro { margin: 20px 0; font-size: 18px; color: #555; }
-    .search-bar { text-align: center; margin-bottom: 20px; }
-    input, select, button { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #ccc; }
-    button { background-color: #007BFF; color: white; border: none; }
-    .card { background: white; border-radius: 10px; padding: 15px; margin: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: inline-block; width: 250px; vertical-align: top; }
-    .card img { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; }
-    .card h3 { margin: 0; font-size: 18px; color: #333; }
-    .card p { font-size: 14px; color: #666; }
-    .card a { color: #007BFF; text-decoration: none; font-size: 14px; }
-    #memberList { text-align: center; }
-    .no-results { font-size: 18px; color: #777; margin-top: 20px; }
-</style>
-<script>
-async function searchMembers() {
-    const query = document.getElementById('searchInput').value;
-    const industry = document.getElementById('industryFilter').value;
-    const location = document.getElementById('locationFilter').value;
-
-    const response = await fetch(`/search?q=${encodeURIComponent(query)}&industry=${encodeURIComponent(industry)}&location=${encodeURIComponent(location)}`);
-    const data = await response.json();
-
-    renderMembers(data.results);
-}
-
-function renderMembers(list) {
-    const container = document.getElementById('memberList');
-    container.innerHTML = '';
-    if (list.length === 0) {
-        container.innerHTML = '<div class="no-results">No results found. Please search again.</div>';
-    } else {
-        list.forEach(member => {
-            const div = document.createElement('div');
-            div.className = 'card';
-            div.innerHTML = `<img src="${member.logo}"><h3>${member.name}</h3><p>${member.bio}</p><a href="${member.website}" target="_blank">Visit Website</a>`;
-            container.appendChild(div);
-        });
+    <title>Member Directory</title>
+    <style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        max-width: 900px;
+        margin: auto;
+        padding: 2rem;
+        background: #f9fafb;
     }
-}
-
-window.onload = () => searchMembers();
-</script>
+    h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: #333;
+    }
+    form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    input, select {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        width: auto;
+        flex: unset;
+    }
+    input[type='submit'] {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        width: auto;
+        flex: none;
+        background-color: #2563eb;
+        color: white;
+        cursor: pointer;
+        border: none;
+    }
+    .carousel {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding-bottom: 1rem;
+    }
+    .carousel .card {
+        min-width: 300px;
+        flex: 0 0 auto;
+    }
+    .card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    .logo {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+    }
+    .info {
+        flex: 1;
+    }
+    .info h2 {
+        margin: 0;
+        font-size: 1.25rem;
+    }
+    .info p {
+        margin: 0.25rem 0;
+        color: #555;
+    }
+    .info a {
+        color: #2563eb;
+        text-decoration: none;
+    }
+    .tags {
+        margin-top: 0.5rem;
+    }
+    .tag {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-right: 6px;
+        font-size: 0.875rem;
+        text-decoration: none;
+    }
+</style>
 </head>
 <body>
-<header>
-  <h1>Innovation and Collaboration in Life Sciences</h1>
-</header>
-<div class="content">
-<div class="intro">Discover our vibrant community of leading-edge life sciences organizations, collaborating to push innovation forward.</div>
-<div class="search-bar">
-<input id="searchInput" placeholder="Search...">
-<select id="industryFilter">
-    <option value="">All Industries</option>
-    <option value="Biotech">Biotech</option>
-    <option value="Medtech">Medtech</option>
-    <option value="Pharma">Pharma</option>
-</select>
-<select id="locationFilter">
-    <option value="">All Locations</option>
-    <option value="British Columbia">British Columbia</option>
-    <option value="Ontario">Ontario</option>
-    <option value="Quebec">Quebec</option>
-</select>
-<button onclick="searchMembers()">Search</button>
+    <h1>Member Directory</h1>
+    <form method="get">
+        <input type="text" name="search" placeholder="Search by keyword or concept..." value="{{ search }}">
+        <select name="industry">
+            <option value="">All Industries</option>
+            <option value="Biotech" {% if industry == 'Biotech' %}selected{% endif %}>Biotech</option>
+            <option value="Nonprofit" {% if industry == 'Nonprofit' %}selected{% endif %}>Nonprofit</option>
+            <option value="Academic Institution" {% if industry == 'Academic Institution' %}selected{% endif %}>Academic Institution</option>
+        </select>
+        <select name="location">
+            <option value="">All Locations</option>
+            <option value="Vancouver" {% if location == 'Vancouver' %}selected{% endif %}>Vancouver</option>
+            <option value="Toronto" {% if location == 'Toronto' %}selected{% endif %}>Toronto</option>
+            <option value="Ottawa" {% if location == 'Ottawa' %}selected{% endif %}>Ottawa</option>
+        </select>
+        <select name="tag" id="advanced">
+            <option value="">-- Select Tag --</option>
+        </select>
+        <input type="submit" value="Search">
+</form>
+<div style="margin-top: 2rem;"></div>
+    {% if tag or search %}
+    {% for m in filtered %}
+    <div class="card">
+    <img src="{{ m.logo }}" class="logo" alt="{{ m.name }} logo">
+    <div class="info">
+        <h2>{{ m.name }}</h2>
+        <p>{{ m.industry }} · {{ m.location }}</p>
+        <p><a href="{{ m.website }}" target="_blank">Visit Website</a></p>
+        <div class="tags" style="margin-top: 0.5rem;">
+            {% for tag in m.tags %}
+            <a href="?search={{ tag }}&industry={{ industry }}&location={{ location }}" class="tag">{{ tag }}</a>
+            {% endfor %}
+                </div>
+    </div>
 </div>
-<div id="memberList"></div>
-</div>
+    </div>
+    {% endfor %}
+{% else %}
+    {% for industry in filtered | map(attribute='industry') | unique %}
+    <h2>{{ industry }}</h2>
+    <div class="carousel">
+        {% for m in filtered if m.industry == industry %}
+        <div class="card">
+            <img src="{{ m.logo }}" class="logo" alt="{{ m.name }} logo">
+            <div class="info">
+                <h2>{{ m.name }}</h2>
+                <p>{{ m.industry }} · {{ m.location }}</p>
+                <p><a href="{{ m.website }}" target="_blank">Visit Website</a></p>
+                <div class="tags">
+                    {% for tag in m.tags %}
+                    <a href="?search={{ tag }}&industry={{ industry }}&location={{ location }}" class="tag">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% endif %}
+
+    <script>
+    const industryTags = {
+        "Biotech": ["Lab Services", "Cell Culture Tools", "Tissue Engineering", "Oncology", "Biologics", "AI", "Antibody Discovery"],
+        "Nonprofit": ["Funding Agency"],
+        "Academic Institution": ["Academic Research"]
+    };
+
+    function updateTagOptions() {
+        const industry = document.querySelector('select[name="industry"]').value;
+        const tagSelect = document.getElementById('advanced');
+        tagSelect.innerHTML = '<option value="">-- Select Tag --</option>';
+
+        if (industryTags[industry]) {
+            industryTags[industry].forEach(tag => {
+                const option = document.createElement('option');
+                option.value = tag;
+                option.textContent = tag;
+                if (tag === "{{ tag }}") option.selected = true;
+                tagSelect.appendChild(option);
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateTagOptions);
+    document.querySelector('select[name="industry"]').addEventListener('change', updateTagOptions);
+    </script>
 </body>
 </html>
-'''
+"""
 
 @app.route('/')
-def index():
-    return render_template_string(HTML_TEMPLATE)
+def directory():
+    tag = request.args.get("tag", "").strip()
+    search = request.args.get("search", "").strip()
+    query = tag or search
+    industry = request.args.get("industry", "")
+    location = request.args.get("location", "")
 
-@app.route('/search')
-def search():
-    query = request.args.get('q', '')
-    industry_filter = request.args.get('industry', '')
-    location_filter = request.args.get('location', '')
+    # Sample data
+    members = [
+        {"name": "LifeLabs", "industry": "Biotech", "location": "Toronto", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/LifeLabs_logo.png/300px-LifeLabs_logo.png", "website": "https://www.lifelabs.com", "tags": ["Lab Services"]},
+        {"name": "BioTalent Canada", "industry": "Nonprofit", "location": "Ottawa", "logo": "https://www.biotalent.ca/wp-content/uploads/2022/06/BioTalent-Logo-2021.png", "website": "https://www.biotalent.ca", "tags": ["Funding Agency"]},
+        {"name": "STEMCELL Technologies", "industry": "Biotech", "location": "Vancouver", "logo": "https://www.stemcell.com/content/dam/stemcell/images/logos/stemcell-logo.png", "website": "https://www.stemcell.com", "tags": ["Cell Culture Tools"]},
+        {"name": "Aspect Biosystems", "industry": "Biotech", "location": "Vancouver", "logo": "https://cdn.globenewswire.com/Attachment/LogoDisplay/1077369?filename=Aspect_Biosystems_Logo.png&size=3", "website": "https://www.aspectbiosystems.com", "tags": ["Tissue Engineering"]},
+        {"name": "Zymeworks", "industry": "Biotech", "location": "Vancouver", "logo": "https://upload.wikimedia.org/wikipedia/en/b/bf/Zymeworks_logo.png", "website": "https://www.zymeworks.com", "tags": ["Oncology", "Biologics"]},
+        {"name": "AbCellera", "industry": "Biotech", "location": "Vancouver", "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/AbCellera_logo.svg/800px-AbCellera_logo.svg.png", "website": "https://www.abcellera.com", "tags": ["AI", "Antibody Discovery"]},
+        {"name": "University of British Columbia", "industry": "Academic Institution", "location": "Vancouver", "logo": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/University_of_British_Columbia_coat_of_arms.svg/200px-University_of_British_Columbia_coat_of_arms.svg.png", "website": "https://www.ubc.ca", "tags": ["Academic Research"]},
+    ]
 
-    if not query:
-        return jsonify(results=members)
+    # Precompute embeddings
+    for m in members:
+        text = m["name"] + ' ' + m["industry"] + ' ' + ' '.join(m["tags"])
+        m["embedding"] = model.encode(text, convert_to_tensor=True)
 
-    query_embedding = model.encode(query, normalize_embeddings=True)
+    # Tag-specific filtering takes priority
+    if tag:
+        filtered = [m for m in members if tag in m["tags"]]
+    elif search:
+        query_embedding = model.encode(search, convert_to_tensor=True)
+        scored = [(m, util.pytorch_cos_sim(query_embedding, m["embedding"]).item()) for m in members]
+        scored.sort(key=lambda x: x[1], reverse=True)
+        filtered = [m for m, score in scored if score > 0.3]
+    else:
+        filtered = members
 
-    scored_members = []
-    for member in members:
-        score = util.cos_sim(query_embedding, member['embedding'])[0][0].item()
-        if (industry_filter == '' or member['industry'] == industry_filter) and \
-           (location_filter == '' or member['location'] == location_filter):
-            scored_members.append((member, score))
+    # Filter by dropdowns
+    filtered = [m for m in filtered if
+                (industry == "" or m["industry"] == industry) and
+                (location == "" or location in m["location"])]
 
-    scored_members.sort(key=lambda x: x[1], reverse=True)
-    filtered = [m for m, score in scored_members if score > 0.2]
-
-    return jsonify(results=filtered)
-
-import os
+    return render_template_string(HTML_TEMPLATE, filtered=filtered, search=search, tag=tag, industry=industry, location=location)
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
-
+    app.run(debug=True)
