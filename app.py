@@ -362,4 +362,4 @@ def directory():
     return render_template_string(HTML_TEMPLATE, filtered=filtered, search=search, tag=tag, industry=industry, location=location)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
