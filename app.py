@@ -18,94 +18,33 @@ HTML_TEMPLATE = """
     adding: 4rem 2rem;
     font-family: 'Inter', sans-serif;
     background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
-            url('https://media.licdn.com/dms/image/v2/D5622AQEdLyR5DSa7Ug/feedshare-shrink_2048_1536/B56ZVOPs8FGQAs-/0/1740774495200?e=1749081600&v=beta&t=zFV3TMZ5k4WbtjaGUwqsA1M57Cka3AH48svPIyXDh9M') repeat-x fixed;
-background-size: contain;       
+    background-size: contain;       
     }
-   .parallax-bg {
-    background-image: url('https://images.unsplash.com/photo-1581090700227-1b9fcf49a54b');
-    height: 100vh;
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: -1;
-}
-.parallax-section {
-    height: 60vh;
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    margin: 4rem 0;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-}
-
+   
     .content {
     position: relative;
     z-index: 1;
-    padding: 2rem;
+    padding: 1.5rem;
    
     margin: auto;
     background: rgba(255, 255, 255, 0.9); /* semi-transparent so parallax shows through */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     border-radius: 10px;
 }
-.hero {
-    
-    height: 60vh;
-    background-image: url('https://media.licdn.com/dms/image/v2/D5622AQGmGuY2NxULiw/feedshare-shrink_2048_1536/feedshare-shrink_2048_1536/0/1726098292633?e=1749081600&v=beta&t=7vBs6fTwAR2wDmIRcd_GlixoKFxabU892a1K-BxQyWg');
-    background-attachment: fixed;
-    background-position: center;
-    background-size: cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 3rem;
-    position: relative;
-    color: white;
-    text-align: center;
 
-}
-.hero-overlay {
-    background-color: rgba(0, 0, 0, 0.4);
-    padding: 3rem;
-    border-radius: 12px;
-}
-.hero-title {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    font-weight: bold;
-    color: white;
-}
-.hero-subtitle {
-    font-size: 1.25rem;
-    font-weight: 300;
-}
-.hero::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://www.transparenttextures.com/patterns/cubes.png');
-    opacity: 0.05;
-    z-index: 0;
-}
 
     h1 {
         text-align: center;
         margin-bottom: 2rem;
         color: #333;
     }
+    h2 {
+        font-size: 2rem;
+        color: #0c1c5c;
+    }
     form {
         display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 1rem;
     justify-content: center;
     align-items: center;
@@ -127,8 +66,8 @@ background-size: contain;
     }
     input[type='submit'] {
         padding: 0.75rem 1.25rem;
-    font-size: 1rem;
-    background: linear-gradient(to right, #3b82f6, #2563eb);
+    font-size: 1.25rem;
+    background: #116aa3;
     color: white;
     cursor: pointer;
     border: none;
@@ -136,34 +75,72 @@ background-size: contain;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     transition: background 0.3s ease;
     }
-    .carousel {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 300px));
-        gap: 2rem;
-        padding-bottom: 2rem;
-    }
-    .carousel .card {
-        background: linear-gradient(to top, #ffffff, #f9fafb);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.5rem;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-    border: 1px solid #e5e7eb;
-    }
-    .card {
-        background: white;
-        border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    transition: transform 0.2s ease;
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
+input[type="submit"]:hover {
+    background-color: white;
+    color: #116aa3;
+    border-color: #116aa3;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  input[type="submit"]:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 1rem;
+  padding: 2rem 1rem;
+  scroll-behavior: smooth;
+}
+.carousel-wrapper {
+  max-width: 1060px; /* 3 cards x 300px + gaps */
+  margin: 0 auto;
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+.carousel-track::-webkit-scrollbar {
+  display: none; /* hide scroll bar for clean look */
+}
+
+.carousel-btn {
+  background: rgba(255,255,255,0.8);
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  z-index: 1;
+}
+
+.carousel-btn.left {
+  position: absolute;
+  left: 0;
+}
+
+.carousel-btn.right {
+  position: absolute;
+  right: 0;
+}
+     
+.card {
+  flex: 0 0 250px;
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 5px 4px 12px #116aa3;
+  scroll-snap-align: start;
+  transition: transform 0.3s;
+}
+
     .card:hover {
     transform: scale(1.015);
     }
@@ -203,14 +180,16 @@ background-size: contain;
     border-radius: 999px;
     transition: background 0.2s ease;
     }
+    .select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 250px;
+}
+
+
 </style>
 </head>
-<div class="hero">
-    <div class="hero-overlay">
-        <h1 class="hero-title">Discover Our Members</h1>
-        <p class="hero-subtitle">Explore innovative organizations across biotech, academia, and beyond</p>
-    </div>
-</div>
+
 <body>
  <div class="parallax-bg"></div>
     <div class="content">
@@ -235,7 +214,9 @@ background-size: contain;
         </select>
         <input type="submit" value="Search">
 </form>
+
 <div style="margin-top: 2rem;"></div>
+
     {% if tag or search %}
     {% for m in filtered %}
     <div class="card">
@@ -254,63 +235,80 @@ background-size: contain;
     </div>
     {% endfor %}
 {% else %}
-    {% for industry in filtered | map(attribute='industry') | unique %}
-    <h2>{{ industry }}</h2>
-    <div class="carousel" style="background-image: url('https://media.licdn.com/dms/image/v2/D5622AQEn_3xTFm78Cg/feedshare-shrink_2048_1536/B56ZVOPs8QGsAo-/0/1740774494628?e=1749081600&v=beta&t=7jEnHXw1b1Hn1KcVcg2hbwt-FeLAqcLgxZtcXzbHXv0');
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            padding: 4rem 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-    
-        {% for m in filtered if m.industry == industry %}
-        <div class="card">
-            <img src="{{ m.logo }}" class="logo" alt="{{ m.name }} logo">
-            <div class="info">
-                <h2>{{ m.name }}</h2>
-                <p>{{ m.industry }} · {{ m.location }}</p>
-                <p><a href="{{ m.website }}" target="_blank">Visit Website</a></p>
-                <div class="tags">
-                    {% for tag in m.tags %}
-                    <a href="?search={{ tag }}&industry={{ industry }}&location={{ location }}" class="tag">{{ tag }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+{% for industry in filtered | map(attribute='industry') | unique %}
+<div class="carousel-wrapper">
+  <h2 class="carousel-title">{{ industry }}</h2>
+  <div class="carousel-track">
+    {% for m in filtered if m.industry == industry %}
+    <div class="card">
+      <img src="{{ m.logo }}" class="logo" alt="{{ m.name }} logo">
+      <h3>{{ m.name }}</h3>
+      <p>{{ m.industry }} · {{ m.location }}</p>
+      <p><a href="{{ m.website }}" target="_blank">Visit Website</a></p>
+      <div class="tags">
+        {% for tag in m.tags %}
+        <a href="?search={{ tag }}&industry={{ industry }}&location={{ location }}" class="tag">{{ tag }}</a>
         {% endfor %}
+      </div>
     </div>
     {% endfor %}
+  </div>
+</div>
+{% endfor %}
+
 {% endif %}
 
 
-    <script>
-    const industryTags = {
-        "Biotech": ["Lab Services", "Cell Culture Tools", "Tissue Engineering", "Oncology", "Biologics", "AI", "Antibody Discovery"],
-        "Nonprofit": ["Funding Agency"],
-        "Academic Institution": ["Academic Research"]
-    };
+   <script>
+  const industryTags = {
+    "Biotech": ["Lab Services", "Cell Culture Tools", "Tissue Engineering", "Oncology", "Biologics", "AI", "Antibody Discovery"],
+    "Nonprofit": ["Funding Agency"],
+    "Academic Institution": ["Academic Research"]
+  };
 
-    function updateTagOptions() {
-        const industry = document.querySelector('select[name="industry"]').value;
-        const tagSelect = document.getElementById('advanced');
-        tagSelect.innerHTML = '<option value="">-- Select Tag --</option>';
+  function updateTagOptions() {
+    const industry = document.querySelector('select[name="industry"]').value;
+    const tagSelect = document.getElementById('advanced');
+    tagSelect.innerHTML = '<option value="">-- Select Tag --</option>';
 
-        if (industryTags[industry]) {
-            industryTags[industry].forEach(tag => {
-                const option = document.createElement('option');
-                option.value = tag;
-                option.textContent = tag;
-                if (tag === "{{ tag }}") option.selected = true;
-                tagSelect.appendChild(option);
-            });
-        }
+    if (industryTags[industry]) {
+      industryTags[industry].forEach(tag => {
+        const option = document.createElement('option');
+        option.value = tag;
+        option.textContent = tag;
+        if (tag === "{{ tag }}") option.selected = true;
+        tagSelect.appendChild(option);
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateTagOptions();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasFilter = urlParams.get('industry') || urlParams.get('q');
+
+    if (hasFilter) {
+      // Convert all carousels into stacked vertical grids
+      document.querySelectorAll('.carousel-track').forEach(track => {
+        track.style.display = 'flex';
+        track.style.flexWrap = 'wrap';
+        track.style.overflowX = 'unset';
+        track.style.gap = '1.5rem';
+      });
+
+      // Widen the cards a bit for the grid look
+      document.querySelectorAll('.card').forEach(card => {
+        card.style.flex = '0 1 calc(25% - 1rem)'; // Smaller card width
+        card.style.maxWidth = '250px'; // Optional max width for smaller look
+      });
     }
 
-    document.addEventListener('DOMContentLoaded', updateTagOptions);
     document.querySelector('select[name="industry"]').addEventListener('change', updateTagOptions);
-    </script>
+  });
+</script>
+
+
     </div>
 </div>
 </body>
